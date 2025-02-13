@@ -1,0 +1,21 @@
+# Virtual Environment
+venv_*/
+drive_dataset/
+sample_data/
+# predict.py
+*.txt
+*.pth
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+*.ico
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
