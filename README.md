@@ -2,12 +2,16 @@
 
 ## make sample data : generate_sample_data_class1.py
 class 0 : background
+
 class 1 : circle
 
 ## make sample data : generate_sample_data_class4.py
 class 0 : background
+
 class 1 : circle
+
 class 2 : rectangle
+
 class 3 : triangle
 
 ## download DRIVE dataset : get_DRIVE_dataset.py
