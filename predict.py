@@ -116,7 +116,7 @@ def predict_image(num_classes, img_path, model_path, img_height, img_width, DEVI
     ])
 
     # 모델 불러오기
-    model = UNet_googleAI(num_classes=num_classes, in_channels=3).to(DEVICE)
+    model = UNet(num_classes=num_classes, in_channels=3).to(DEVICE)
     model.load_state_dict(torch.load(model_path, weights_only=True))
     model.eval()  # 모델을 평가 모드로 설정 (Batch Normalization, Dropout 비활성화)
 

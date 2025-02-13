@@ -390,7 +390,7 @@ def train_model():
     print('-' * 50)
     
     # 모델 초기화
-    model = UNet_googleAI(num_classes=num_classes, in_channels=3).to(device)
+    model = UNet(num_classes=num_classes, in_channels=3).to(device)
     
     # 손실 함수 설정
     if num_classes == 1:
