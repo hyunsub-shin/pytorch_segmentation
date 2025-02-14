@@ -82,22 +82,23 @@ class SegmentationDataset(Dataset):
 
                 # 마스크에도 동일한 transform 적용을 위해 같은 시드 재설정
                 torch.manual_seed(seed)
-                mask1 = self.mask_transform(mask)
+                mask = self.mask_transform(mask)
                 
-                mask_array = np.array(mask1)
-                mask_array[mask_array == 100] = 1  # 100을 1로 변환
-                mask_array[mask_array == 200] = 2  # 200을 2로 변환
-                mask_array[mask_array == 255] = 3  # 255을 3로 변환
+                if self.num_classes > 1:
+                    mask_array = np.array(mask)
+                    mask_array[mask_array == 100] = 1  # 100을 1로 변환
+                    mask_array[mask_array == 200] = 2  # 200을 2로 변환
+                    mask_array[mask_array == 255] = 3  # 255을 3로 변환
                 mask1 = Image.fromarray(mask_array)
                 ###################################################################
                 # for debug
-                plt.subplot(121)
-                plt.imshow(mask, cmap='gray')  # 마스크를 그레이스케일로 시각화
-                plt.subplot(122)
-                plt.imshow(mask1, cmap='gray')  # 마스크를 그레이스케일로 시각화 
-                plt.title("Mask Visualization")
-                plt.colorbar()  # 색상 바 추가
-                plt.show()
+                # plt.subplot(121)
+                # plt.imshow(mask, cmap='gray')  # 마스크를 그레이스케일로 시각화
+                # plt.subplot(122)
+                # plt.imshow(mask1, cmap='gray')  # 마스크를 그레이스케일로 시각화 
+                # plt.title("Mask Visualization")
+                # plt.colorbar()  # 색상 바 추가
+                # plt.show()
                 ###################################################################
                 
             # 매핑된 NumPy 배열 마스크를 LongTensor로 변환
@@ -470,6 +471,10 @@ def train_model(model, train_loader, val_loader, criterion, optimizer, num_epoch
             images = images.to(device)
             masks = masks.to(device)
             
+            # 이미지와 마스크 비교 검증
+            if batch_idx in [0, len(train_loader)-1]:
+                visualize_batch(images, masks, epoch, batch_idx)
+            
             optimizer.zero_grad()
             outputs = model(images)
             loss = criterion(outputs, masks)
@@ -589,14 +594,14 @@ if __name__ == '__main__':
 
     # 학습 시작 전에 검증 실행
     # verify_mask_files(train_dataset)
-    check_mask_values(train_dataset)
-    check_class_distribution(train_dataset)
+    # check_mask_values(train_dataset)
+    # check_class_distribution(train_dataset)
     # check_model_output(model, train_loader)
 
     print("\n=== 학습 시작 ===")
     
     train_losses = []    
     # 학습 루프
-    # train_model(model, train_loader, val_loader, criterion, optimizer, 20)
+    train_model(model, train_loader, val_loader, criterion, optimizer, 1)
 
 
