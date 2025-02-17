@@ -5,6 +5,7 @@ class DoubleConv(nn.Module):
     def __init__(self, in_channels, out_channels):
         super().__init__()
         self.double_conv = nn.Sequential(
+            # out = (input - kernel + 2*padding)/stride + 1
             nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1),
             nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True),
@@ -20,6 +21,7 @@ class TripleConv(nn.Module):
     def __init__(self, in_channels, out_channels):
         super().__init__()
         self.triple_conv = nn.Sequential(
+            # out = (input - kernel + 2*padding)/stride + 1
             nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1),
             nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True),
@@ -58,6 +60,7 @@ class UNet(nn.Module):
         
         # Upsampling
         self.up = nn.ModuleList([
+            # Output = Stride × (Input − 1) + Kernel Size − (2 × Padding)
             nn.ConvTranspose2d(1024, 512, kernel_size=2, stride=2),
             nn.ConvTranspose2d(512, 256, kernel_size=2, stride=2),
             nn.ConvTranspose2d(256, 128, kernel_size=2, stride=2),
