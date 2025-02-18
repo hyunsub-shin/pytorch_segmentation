@@ -7,6 +7,7 @@ from matplotlib.patches import Patch
 import numpy as np
 from models.unet import *  # 모델 파일에서 U-Net 클래스 import
 import platform  # 폰트관련 운영체제 확인
+from skimage.transform import resize
 
 # 마스크를 컬러 이미지로 변환
 def convert_to_color_mask(mask, color_map):
@@ -47,8 +48,9 @@ def visualize_result(image, predicted_mask, num_classes):
     else:
         mask = predicted_mask.cpu().numpy()  # GPU -> CPU, NumPy 배열로 변환
         color_mask = convert_to_color_mask(mask, COLOR_MAP)   # 마스크를 컬러 이미지로 변환
-        # print(f'color_mask = {mask}')
-
+    
+    mask = resize(mask, (image.shape[0],image.shape[1]))
+    
     fig, axes = plt.subplots(1, 2, figsize=(10, 5))
     axes[0].imshow(image) # 원본 이미지 표시
     axes[0].set_title('Original Image')
@@ -61,7 +63,7 @@ def visualize_result(image, predicted_mask, num_classes):
 
     axes[1].set_title('Predicted Mask')
     axes[1].axis('off') # 축 숨기기
-    
+        
     # 범례 추가
     legend_elements = [Patch(facecolor=np.array(color)/255, 
                            label=f'{CLASS_NAMES[class_id]}')
@@ -86,7 +88,7 @@ def get_color_map(num_classes):
         }
         CLASS_NAMES = {
             0: "배경",
-            1: "OBJECT",
+            1: "Blood Vessel",
         }
     else:
         COLOR_MAP = {
@@ -132,7 +134,7 @@ def predict_image(num_classes, img_path, model_path, img_height, img_width, DEVI
         output = model(input_tensor)  # 모델에 입력 이미지 전달
         if num_classes == 1:
             output = torch.sigmoid(output) # Sigmoid 함수 적용 (출력값을 0과 1 사이로 변환)
-            # predicted_mask = (output>0.22).float()
+            # predicted_mask = (output>0.4).float()
             predicted_mask = (output).float()
             predicted_mask = predicted_mask.squeeze()  # (1, H, W) -> (H, W)
         else:
@@ -161,11 +163,11 @@ if __name__ == "__main__":
     plt.rcParams['axes.unicode_minus'] = False
     
     # 예측 설정
-    # DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu') # GPU 사용 여부 확인
-    DEVICE = torch.device('cpu')
+    DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu') # GPU 사용 여부 확인
+    # DEVICE = torch.device('cpu')
     
     MODEL_PATH = 'unet_segmentation.pth'  # 학습된 모델 파일 경로 (실제 경로로 변경!)
-    # IMAGE_PATH = 'sample_data/test1.png' # 예측할 이미지 파일 경로 (실제 경로로 변경!)
+    # IMAGE_PATH = 'sample_data/test2.png' # 예측할 이미지 파일 경로 (실제 경로로 변경!)
     IMAGE_PATH = 'drive_dataset/image_3.png' # 예측할 이미지 파일 경로 (실제 경로로 변경!)
     NUM_CLASSES = 1 # 클래스 개수 (배경 포함)
 
