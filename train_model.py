@@ -352,15 +352,15 @@ def plot_training_loss(train_losses):
 def train_model():
     ###################################################
     # # 하이퍼 파라메터 설정
-    num_epochs = 10
+    num_epochs = 50
     batch_size = 4
     learning_rate = 1e-4
     
     # 데이터 경로 설정
-    DATA_DIR = './drive_dataset'
-    num_classes = 1
-    # DATA_DIR = './sample_data'
-    # num_classes = 4
+    # DATA_DIR = './drive_dataset'
+    # num_classes = 1
+    DATA_DIR = './sample_data'
+    num_classes = 4
     
     # 입력 크기 설정
     input_height = 256
@@ -425,6 +425,10 @@ def train_model():
     
     print("\n=== 학습 시작 ===")
     train_losses = []    
+    best_train_loss = float('inf')
+    patience = 3
+    patience_counter = 0
+    
     # 학습 루프
     for epoch in range(num_epochs):
         model.train()
@@ -474,7 +478,15 @@ def train_model():
         # 모델 저장 - checkpoint
         # if (epoch + 1) % 10 == 0:
         #     torch.save(model.state_dict(), f'checkpoints/unet_epoch_{epoch+1}.pth')
-            
+        if train_loss < best_train_loss:
+            best_train_loss = train_loss
+            torch.save(model.state_dict(), 'best_unet_segmentation.pth')
+        else:
+            patience_counter += 1
+            if patience_counter >= patience:
+                print(f'조기 종료: {epoch+1} 에포크에서 학습 중단')
+                break  
+       
     # 모델 저장
     torch.save(model.state_dict(), 'unet_segmentation.pth')
     print('Finished Training & Save model')
@@ -502,11 +514,11 @@ if __name__ == '__main__':
     # # for debug
     # # 학습 시작 전에 검증 실행
     # train_loader = create_dataloaders(
-    #     data_dir='drive_dataset',
+    #     data_dir='sample_data',
     #     input_height=256,
     #     input_width=256,
     #     batch_size=4,
-    #     num_classes=1,
+    #     num_classes=4,
     #     is_train=True
     # )
     # train_dataset = train_loader.dataset
